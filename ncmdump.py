@@ -29,13 +29,8 @@ def dump(file_path):
     key_length = f.read(4)
     key_length = struct.unpack('<I', bytes(key_length))[0]
 
-    key_data = f.read(key_length)
-    key_data_array = bytearray(key_data)
-    i = 0
-    while i < len(key_data_array):
-        key_data_array[i] ^= 0x64
-        i += 1
-    key_data = bytes(key_data_array)
+    key_data = bytearray(f.read(key_length))
+    key_data = bytes(bytearray([byte ^ 0x64 for byte in key_data]))
 
     cryptor = AES.new(core_key, AES.MODE_ECB)
     key_data = unpad(cryptor.decrypt(key_data))[17:]
@@ -44,31 +39,18 @@ def dump(file_path):
     # key box
     key_data = bytearray(key_data)
     key_box = bytearray(range(256))
-    c = 0
-    last_byte = 0
-    key_offset = 0
+    j = 0
 
     for i in range(256):
-        swap = key_box[i]
-        c = (swap + last_byte + key_data[key_offset]) & 0xff
-        key_offset += 1
-        if key_offset >= key_length:
-            key_offset = 0
-        key_box[i] = key_box[c]
-        key_box[c] = swap
-        last_byte = c
+        j = (key_box[i] + j + key_data[i % key_length]) & 0xff
+        key_box[i], key_box[j] = key_box[j], key_box[i]
 
     # meta data
     meta_length = f.read(4)
     meta_length = struct.unpack('<I', bytes(meta_length))[0]
 
-    meta_data = f.read(meta_length)
-    meta_data_array = bytearray(meta_data)
-    i = 0
-    while i < len(meta_data_array):
-        meta_data_array[i] ^= 0x63
-        i += 1
-    meta_data = bytes(meta_data_array)
+    meta_data = bytearray(f.read(meta_length))
+    meta_data = bytes(bytearray([byte ^ 0x63 for byte in meta_data]))
     meta_data = base64.b64decode(meta_data[22:])
 
     cryptor = AES.new(meta_key, AES.MODE_ECB)
@@ -86,7 +68,7 @@ def dump(file_path):
     image_data = f.read(image_size)
 
     # media data
-    file_name = meta_data['musicName'] + '.' + meta_data['format']
+    file_name = meta_data['artist'][0][0] + ' - ' + meta_data['musicName'] + '.' + meta_data['format']
     m = open(os.path.join(os.path.split(file_path)[0],file_name),'wb')
 
     chunk = bytearray()
@@ -97,7 +79,7 @@ def dump(file_path):
             break
 
         for i in range(chunk_length):
-            j = (i + 1) & 0xff;
+            j = (i + 1) & 0xff
             chunk[i] ^= key_box[(key_box[j] + key_box[(key_box[j] + j) & 0xff]) & 0xff]
 
         m.write(chunk)
