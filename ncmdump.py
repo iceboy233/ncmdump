@@ -11,6 +11,7 @@ import base64
 import json
 import os
 from Crypto.Cipher import AES
+from mutagen import mp3, flac, id3
 
 def dump(file_path):
 
@@ -69,9 +70,9 @@ def dump(file_path):
 
     # media data
     file_name = meta_data['artist'][0][0] + ' - ' + meta_data['musicName'] + '.' + meta_data['format']
-    m = open(os.path.join(os.path.split(file_path)[0],file_name),'wb')
+    music_path = os.path.join(os.path.split(file_path)[0],file_name)
+    m = open(music_path,'wb')
 
-    chunk = bytearray()
     while True:
         chunk = bytearray(f.read(0x8000))
         chunk_length = len(chunk)
@@ -87,13 +88,47 @@ def dump(file_path):
     m.close()
     f.close()
 
+    # media tag
+    if meta_data['format'] == 'flac':
+        audio = flac.FLAC(music_path)
+        audio.delete()
+        image = flac.Picture()
+        image.type = 3
+        image.mime = 'image/jpeg'
+        image.data = image_data
+        audio.clear_pictures()
+        audio.add_picture(image)
+    elif meta_data['format'] == 'mp3':
+        audio = mp3.MP3(music_path)
+        audio.delete()
+        image = id3.APIC()
+        image.type = 3
+        image.mime = 'image/jpeg'
+        image.data = image_data
+        audio.tags.add(image)
+        audio.save()
+        audio = mp3.EasyMP3(music_path)
+
+    audio['title'] = meta_data['musicName']
+    audio['album'] = meta_data['album']
+    audio['artist'] = ';'.join([artist[0] for artist in meta_data['artist']])
+    audio.save()
+
 if __name__ == '__main__':
     import sys
     if len(sys.argv) > 1:
-        for file_path in sys.argv[1:]:
-            try:
-                dump(file_path)
-            except:
-                pass
+        files = sys.argv[1:]
     else:
+        files = [file_name for file_name in os.listdir('.') if os.path.splitext(file_name)[-1] == '.ncm']
+
+    if not files:
         print('please input file path!')
+        
+    for file_name in files:
+        try:
+            dump(file_name)
+            print(os.path.split(file_name)[-1])
+        except Exception as e:
+            print(e)
+            pass
+        

@@ -2,16 +2,20 @@
 
 ## 简介
 
-早就在算计网易云ncm文件，不过一直没什么机会，前些天突然看到已经有大佬 [anonymous5l/ncmdump ](https://github.com/anonymous5l/ncmdump)实现了，因为好奇加密算法就用Python移植了下，啊大佬不愧是大佬，感激！测试发现转换出来的媒体文件都已包含媒体信息，故未再实现原repo中的写tag操作。还有Python实现比C++慢不少。仅供学习交流，请勿传播扩散。用Python处理字节真让人头大emmm
-
+感激大佬的 [anonymous5l/ncmdump ](https://github.com/anonymous5l/ncmdump)项目，因好奇加密算法就用Python移植了下。自测发现转换出来的媒体文件都已包含媒体信息(包括专辑封面)，~~故未再实现原repo中的写tag操作~~，应issue要求还是补上了写tag操作。Python实现比C++慢不少，实用性不大，仅供学习交流，请勿传播扩散。
 ## 依赖
 
 ```
-pip(3) install pycrypto
+pip(3) install pycrypto mutagen
 ```
 
 ## 使用
 
+指定ncm文件
 ```
 python(3) ncmdump.py [files ...]
+```
+工作目录下所有ncm文件
+```
+python(3) ncmdump.py
 ```
