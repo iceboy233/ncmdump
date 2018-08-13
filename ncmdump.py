@@ -91,7 +91,7 @@ def dump(file_path):
     # media tag
     if meta_data['format'] == 'flac':
         audio = flac.FLAC(music_path)
-        audio.delete()
+        # audio.delete()
         image = flac.Picture()
         image.type = 3
         image.mime = 'image/jpeg'
@@ -100,7 +100,7 @@ def dump(file_path):
         audio.add_picture(image)
     elif meta_data['format'] == 'mp3':
         audio = mp3.MP3(music_path)
-        audio.delete()
+        # audio.delete()
         image = id3.APIC()
         image.type = 3
         image.mime = 'image/jpeg'
@@ -111,7 +111,7 @@ def dump(file_path):
 
     audio['title'] = meta_data['musicName']
     audio['album'] = meta_data['album']
-    audio['artist'] = ';'.join([artist[0] for artist in meta_data['artist']])
+    audio['artist'] = '/'.join([artist[0] for artist in meta_data['artist']])
     audio.save()
 
 if __name__ == '__main__':
