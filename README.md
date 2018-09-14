@@ -6,7 +6,7 @@
 ## 依赖
 
 ```
-pip(3) install pycrypto mutagen
+pip(3) install pycryptodome mutagen
 ```
 
 ## 使用
