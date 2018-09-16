@@ -10,8 +10,28 @@ import struct
 import base64
 import json
 import os
+import re
 from Crypto.Cipher import AES
 from mutagen import mp3, flac, id3
+
+
+# 文件名有效化函数，用于移除曲名中特殊字符从而成功创建文件
+def validate_title(title):
+    special_char = r"[\/\\\:\*\?\"\<\>\|]"  # '/ \ : * ? " < > |'
+    new_title = re.sub(special_char, "_", title)  # 替换为下划线
+    return new_title
+
+# 网易云音乐获取的文件若存在重名情况，一般在文件名后加"(X)"，X为数字
+#
+def validate_collision(filename):
+    start_num = 1
+    ori_filename_no_ext = os.path.splitext(filename)[0]
+    ori_file_ext = os.path.splitext(filename)[-1]
+    while os.path.exists(filename):
+        filename = ori_filename_no_ext + '(' + str(start_num) + ')' + ori_file_ext
+        start_num = start_num + 1
+    return filename
+
 
 def dump(file_path):
 
@@ -69,7 +89,11 @@ def dump(file_path):
     image_data = f.read(image_size)
 
     # media data
-    file_name = meta_data['artist'][0][0] + ' - ' + meta_data['musicName'] + '.' + meta_data['format']
+    # Need to remove special characters in meta_data['musicName'] to make a valid filename
+    file_name = validate_title(meta_data['artist'][0][0] + ' - ' + meta_data['musicName'] + '.' + meta_data['format'])
+    # Try if there already a file with same name, if so, modify current filename
+    file_name = validate_collision(file_name)
+
     music_path = os.path.join(os.path.split(file_path)[0],file_name)
     m = open(music_path,'wb')
 
@@ -120,6 +144,8 @@ if __name__ == '__main__':
         files = sys.argv[1:]
     else:
         files = [file_name for file_name in os.listdir('.') if os.path.splitext(file_name)[-1] == '.ncm']
+        # 逆序一下防止python将XXX(1)放在XXX之前，导致dump出文件不对应
+        files.reverse()
 
     if not files:
         print('please input file path!')
