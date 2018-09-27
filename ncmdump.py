@@ -10,25 +10,8 @@ import struct
 import base64
 import json
 import os
-import re
 from Crypto.Cipher import AES
 from mutagen import mp3, flac, id3
-
-def validate_name(file_name):
-    # pattern = r"[\/\\\:\*\?\"\<\>\|]"
-    # file_name = re.sub(pattern, "_", file_name)
-    # return file_name
-    pattern = {u'\\': u'＼', u'/': u'／', u':': u'：', u'*': u'＊', u'?': u'？', u'"': u'＂', u'<': u'＜', u'>': u'＞', u'|': u'｜'}
-    for character in pattern:
-        file_name = file_name.replace(character, pattern[character])
-    return file_name
-
-# def validate_collision(file_name):
-#     index = 1
-#     while os.path.exists(file_name):
-#         file_name = '({})'.format(index).join(os.path.splitext(file_name))
-#         index += 1
-#     return file_name
 
 def dump(file_path):
 
@@ -86,10 +69,7 @@ def dump(file_path):
     image_data = f.read(image_size)
 
     # media data
-    file_name = validate_name(','.join([artist[0] for artist in meta_data['artist']]) + ' - ' + meta_data['musicName'] + '.' + meta_data['format'])
-    # file_name = validate_collision(file_name)
-
-    music_path = os.path.join(os.path.split(file_path)[0],file_name)
+    music_path = os.path.splitext(file_path)[0] + '.' + meta_data['format']
     m = open(music_path,'wb')
 
     while True:
@@ -139,6 +119,8 @@ if __name__ == '__main__':
         files = sys.argv[1:]
     else:
         files = [file_name for file_name in os.listdir('.') if os.path.splitext(file_name)[-1] == '.ncm']
+    if sys.version[0] == '2':
+        files = [file_name.decode(sys.stdin.encoding) for file_name in files]
 
     if not files:
         print('please input file path!')
