@@ -13,13 +13,14 @@ import os
 from Crypto.Cipher import AES
 from mutagen import mp3, flac, id3
 
-def dump(file_path):
+def dump(input_path, output_path = None):
 
+    output_path = (lambda path, meta : os.path.splitext(path)[0] + '.' + meta['format']) if not output_path else output_path
     core_key = binascii.a2b_hex('687A4852416D736F356B496E62617857')
     meta_key = binascii.a2b_hex('2331346C6A6B5F215C5D2630553C2728')
     unpad = lambda s : s[0:-(s[-1] if type(s[-1]) == int else ord(s[-1]))]
 
-    f = open(file_path,'rb')
+    f = open(input_path,'rb')
 
     # magic header
     header = f.read(8)
@@ -69,8 +70,8 @@ def dump(file_path):
     image_data = f.read(image_size)
 
     # media data
-    music_path = os.path.splitext(file_path)[0] + '.' + meta_data['format']
-    m = open(music_path,'wb')
+    output_path = output_path(input_path, meta_data)
+    m = open(output_path,'wb')
 
     while True:
         chunk = bytearray(f.read(0x8000))
@@ -89,7 +90,7 @@ def dump(file_path):
 
     # media tag
     if meta_data['format'] == 'flac':
-        audio = flac.FLAC(music_path)
+        audio = flac.FLAC(output_path)
         # audio.delete()
         image = flac.Picture()
         image.type = 3
@@ -98,7 +99,7 @@ def dump(file_path):
         audio.clear_pictures()
         audio.add_picture(image)
     elif meta_data['format'] == 'mp3':
-        audio = mp3.MP3(music_path)
+        audio = mp3.MP3(output_path)
         # audio.delete()
         image = id3.APIC()
         image.type = 3
@@ -106,12 +107,14 @@ def dump(file_path):
         image.data = image_data
         audio.tags.add(image)
         audio.save()
-        audio = mp3.EasyMP3(music_path)
+        audio = mp3.EasyMP3(output_path)
 
     audio['title'] = meta_data['musicName']
     audio['album'] = meta_data['album']
     audio['artist'] = '/'.join([artist[0] for artist in meta_data['artist']])
     audio.save()
+    
+    return output_path
 
 if __name__ == '__main__':
     import sys
@@ -132,4 +135,3 @@ if __name__ == '__main__':
         except Exception as e:
             print(e)
             pass
-        
