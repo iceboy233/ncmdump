@@ -82,7 +82,7 @@ for item in args.input:
     if os.path.isdir(item):
         files += [os.path.join(item, _file) for _file in os.listdir(item) if os.path.splitext(_file)[-1] == '.ncm']
     else:
-        flles += [item]
+        files += [item]
 
 if sys.version[0] == '2':
     files = [file_name.decode(sys.stdin.encoding) for file_name in files]
