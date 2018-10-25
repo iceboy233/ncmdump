@@ -38,14 +38,14 @@ def dump(input_path, output_path = None):
     key_data = unpad(cryptor.decrypt(key_data))[17:]
     key_length = len(key_data)
 
-    # key box
-    key_data = bytearray(key_data)
-    key_box = bytearray(range(256))
+    # key box (standard RC4 Key-scheduling algorithm)
+    key = bytearray(key_data)
+    S = bytearray(range(256))
     j = 0
 
     for i in range(256):
-        j = (key_box[i] + j + key_data[i % key_length]) & 0xff
-        key_box[i], key_box[j] = key_box[j], key_box[i]
+        j = (j + S[i] + key[i % key_length]) % 256
+        S[i], S[j] = S[j], S[i]
 
     # meta data
     meta_length = f.read(4)
@@ -72,19 +72,18 @@ def dump(input_path, output_path = None):
     # media data
     output_path = output_path(input_path, meta_data)
     m = open(output_path,'wb')
+    data = bytearray(f.read())
 
-    while True:
-        chunk = bytearray(f.read(0x8000))
-        chunk_length = len(chunk)
-        if not chunk:
-            break
+    # stream cipher (modified RC4 Pseudo-random generation algorithm)
+    i = 0
+    j = 0
+    for k, _ in enumerate(data):
+        i = (i + 1) % 256
+        j = (i + S[i]) % 256 # in RC4, is j = (j + S[i]) % 256
+        # S[i], S[j] = S[j], S[i] # skip swapping
+        data[k] ^= S[(S[i] + S[j]) % 256]
 
-        for i in range(chunk_length):
-            j = (i + 1) & 0xff
-            chunk[i] ^= key_box[(key_box[j] + key_box[(key_box[j] + j) & 0xff]) & 0xff]
-
-        m.write(chunk)
-
+    m.write(data)
     m.close()
     f.close()
 
