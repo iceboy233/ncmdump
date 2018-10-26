@@ -38,7 +38,7 @@ def dump(input_path, output_path = None):
     key_data = unpad(cryptor.decrypt(key_data))[17:]
     key_length = len(key_data)
 
-    # key box (standard RC4 Key-scheduling algorithm)
+    # S-box (standard RC4 Key-scheduling algorithm)
     key = bytearray(key_data)
     S = bytearray(range(256))
     j = 0
@@ -80,7 +80,7 @@ def dump(input_path, output_path = None):
     for k, _ in enumerate(data):
         i = (i + 1) % 256
         j = (i + S[i]) % 256 # in RC4, is j = (j + S[i]) % 256
-        # S[i], S[j] = S[j], S[i] # skip swapping
+        # S[i], S[j] = S[j], S[i] # no swapping
         data[k] ^= S[(S[i] + S[j]) % 256]
 
     m.write(data)
