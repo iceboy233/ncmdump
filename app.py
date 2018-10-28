@@ -37,8 +37,9 @@ def validate_name(file_name):
 
 def validate_collision(file_path):
     index = 1
+    origin = file_path
     while os.path.exists(file_path):
-        file_path = '({})'.format(index).join(os.path.splitext(file_path))
+        file_path = '({})'.format(index).join(os.path.splitext(origin))
         index += 1
     return file_path
 
