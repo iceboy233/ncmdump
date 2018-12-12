@@ -13,7 +13,7 @@ import os
 from Crypto.Cipher import AES
 from mutagen import mp3, flac, id3
 
-def dump(input_path, output_path = None):
+def dump(input_path, output_path = None, skip = True):
 
     output_path = (lambda path, meta : os.path.splitext(path)[0] + '.' + meta['format']) if not output_path else output_path
     core_key = binascii.a2b_hex('687A4852416D736F356B496E62617857')
@@ -71,6 +71,7 @@ def dump(input_path, output_path = None):
 
     # media data
     output_path = output_path(input_path, meta_data)
+    if skip and os.path.exists(output_path): return
     m = open(output_path,'wb')
     data = bytearray(f.read())
 
@@ -120,17 +121,18 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         files = sys.argv[1:]
     else:
-        files = [file_name for file_name in os.listdir('.') if os.path.splitext(file_name)[-1] == '.ncm']
+        files = [name for name in os.listdir('.') if os.path.splitext(name)[-1] == '.ncm']
+    
     if sys.version[0] == '2':
-        files = [file_name.decode(sys.stdin.encoding) for file_name in files]
+        files = [path.decode(sys.stdin.encoding) for path in files]
 
     if not files:
         print('please input file path!')
         
-    for file_name in files:
+    for path in files:
         try:
-            dump(file_name)
-            print(os.path.split(file_name)[-1])
+            dump(path)
+            print(os.path.split(path)[-1])
         except Exception as e:
             print(e)
             pass

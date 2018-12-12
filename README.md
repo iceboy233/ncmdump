@@ -9,7 +9,6 @@
 ## Fork
 
 - [JamieDummy/NCM_dump](https://github.com/JamieDummy/NCM_dump): 增加 GUI
-
 - [mnilzg/ncmdump](https://github.com/mnilzg/ncmdump): 使用 numpy 大幅提高性能 
 
 
@@ -34,7 +33,7 @@ $ python ncmdump.py
 ### 更多选项
 ```
 $ python app.py -h
-usage: ncmdump [-h] [-f format] [-o output] [-d] [input [input ...]]
+usage: ncmdump [-h] [-f format] [-o output] [-d] [-c | -s] [input [input ...]]
 
 positional arguments:
   input       ncm file or folder path
@@ -44,6 +43,8 @@ optional arguments:
   -f format   customize naming format
   -o output   customize saving folder
   -d          delete source after conversion
+  -c          overwrite file with the same name
+  -s          skip conversion if file exist
 ```
 
 > 自定义命名参数: %artist%, %title%, %album%

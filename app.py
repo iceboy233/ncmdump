@@ -24,8 +24,17 @@ parser.add_argument(
     help = 'customize saving folder'
 )
 parser.add_argument(
-    '-d', dest = 'delete', action='store_true',
+    '-d', dest = 'delete', action = 'store_true',
     help = 'delete source after conversion'
+)
+group = parser.add_mutually_exclusive_group()
+group.add_argument(
+    '-c', dest = 'cover', action = 'store_true',
+    help = 'overwrite file with the same name'
+)
+group.add_argument(
+    '-s', dest = 'skip', action = 'store_true',
+    help = 'skip conversion if file exist'
 )
 args = parser.parse_args()
 
@@ -63,7 +72,7 @@ def name_format(path, meta):
     name += '.' + meta['format']
     folder = args.output if args.output else os.path.dirname(path)
     save = os.path.join(folder, name)
-    save = validate_collision(save)
+    if not (args.cover or args.skip): save = validate_collision(save)
     return save
 
 if args.output:
@@ -76,26 +85,26 @@ if args.output:
         exit()
 
 files = []
-for item in args.input:
-    item = os.path.abspath(item)
-    if not os.path.exists(item):
+for path in args.input:
+    path = os.path.abspath(path)
+    if not os.path.exists(path):
         continue
-    if os.path.isdir(item):
-        files += [os.path.join(item, _file) for _file in os.listdir(item) if os.path.splitext(_file)[-1] == '.ncm']
+    if os.path.isdir(path):
+        files += [os.path.join(path, name) for name in os.listdir(path) if os.path.splitext(name)[-1] == '.ncm']
     else:
-        files += [item]
+        files += [path]
 
 if sys.version[0] == '2':
-    files = [file_name.decode(sys.stdin.encoding) for file_name in files]
+    files = [path.decode(sys.stdin.encoding) for path in files]
 
 if not files:
     print('empty input')
     exit()
 
-for _file in files:
+for path in files:
     try:
-        _save = ncmdump.dump(_file, name_format)
-        print(os.path.split(_save)[-1])
-        if args.delete: os.remove(_file)
+        save = ncmdump.dump(path, name_format, args.skip)
+        if save: print(os.path.split(save)[-1])
+        if args.delete: os.remove(path)
     except KeyboardInterrupt:
         exit()
