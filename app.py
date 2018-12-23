@@ -38,19 +38,19 @@ group.add_argument(
 )
 args = parser.parse_args()
 
-def validate_name(file_name):
+def validate_name(name):
     pattern = {u'\\': u'＼', u'/': u'／', u':': u'：', u'*': u'＊', u'?': u'？', u'"': u'＂', u'<': u'＜', u'>': u'＞', u'|': u'｜'}
     for character in pattern:
-        file_name = file_name.replace(character, pattern[character])
-    return file_name
+        name = name.replace(character, pattern[character])
+    return name
 
-def validate_collision(file_path):
+def validate_collision(path):
     index = 1
-    origin = file_path
-    while os.path.exists(file_path):
-        file_path = '({})'.format(index).join(os.path.splitext(origin))
+    origin = path
+    while os.path.exists(path):
+        path = '({})'.format(index).join(os.path.splitext(origin))
         index += 1
-    return file_path
+    return path
 
 def name_format(path, meta):
     information = {
