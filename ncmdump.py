@@ -93,6 +93,7 @@ def dump(input_path, output_path = None, skip = True):
         audio = flac.FLAC(output_path)
         # audio.delete()
         image = flac.Picture()
+        image.encoding = 0
         image.type = 3
         image.mime = 'image/jpeg'
         image.data = image_data
@@ -102,6 +103,7 @@ def dump(input_path, output_path = None, skip = True):
         audio = mp3.MP3(output_path)
         # audio.delete()
         image = id3.APIC()
+        image.encoding = 0
         image.type = 3
         image.mime = 'image/jpeg'
         image.data = image_data
