@@ -11,6 +11,7 @@ import base64
 import json
 import os
 from Crypto.Cipher import AES
+from Crypto.Util.strxor import strxor as XOR
 from mutagen import mp3, flac, id3
 
 def dump(input_path, output_path = None, skip = True):
@@ -20,7 +21,7 @@ def dump(input_path, output_path = None, skip = True):
     meta_key = binascii.a2b_hex('2331346C6A6B5F215C5D2630553C2728')
     unpad = lambda s : s[0:-(s[-1] if type(s[-1]) == int else ord(s[-1]))]
 
-    f = open(input_path,'rb')
+    f = open(input_path, 'rb')
 
     # magic header
     header = f.read(8)
@@ -44,7 +45,7 @@ def dump(input_path, output_path = None, skip = True):
     j = 0
 
     for i in range(256):
-        j = (j + S[i] + key[i % key_length]) % 256
+        j = (j + S[i] + key[i % key_length]) & 0xFF
         S[i], S[j] = S[j], S[i]
 
     # meta data
@@ -72,21 +73,26 @@ def dump(input_path, output_path = None, skip = True):
     # media data
     output_path = output_path(input_path, meta_data)
     if skip and os.path.exists(output_path): return
-    m = open(output_path,'wb')
+
     data = bytearray(f.read())
+    f.close()
 
     # stream cipher (modified RC4 Pseudo-random generation algorithm)
-    i = 0
-    j = 0
-    for k, _ in enumerate(data):
-        i = (i + 1) % 256
-        j = (i + S[i]) % 256 # in RC4, is j = (j + S[i]) % 256
-        # S[i], S[j] = S[j], S[i] # no swapping
-        data[k] ^= S[(S[i] + S[j]) % 256]
+    # i = 0
+    # j = 0
+    # for k, _ in enumerate(data):
+    #     i = (i + 1) % 256
+    #     j = (i + S[i]) % 256 # in RC4, is j = (j + S[i]) % 256
+    #     # S[i], S[j] = S[j], S[i] # no swapping
+    #     data[k] ^= S[(S[i] + S[j]) % 256]
 
+    stream = [S[(S[i] + S[(i + S[i]) & 0xFF]) & 0xFF] for i in range(256)]
+    stream = bytearray(stream * (len(data) // 256 + 1))[1:1 + len(data)]
+    data = XOR(data, stream)
+
+    m = open(output_path, 'wb')
     m.write(data)
     m.close()
-    f.close()
 
     # media tag
     if meta_data['format'] == 'flac':
