@@ -2,14 +2,14 @@
 
 ![shield](https://img.shields.io/badge/python-2.7%7C3.4+-blue.svg)
 
-## About
+## Thank
 
-感谢大佬的 [anonymous5l/ncmdump](https://github.com/anonymous5l/ncmdump) 项目，因好奇加密算法就用 python 移植了下。仅供学习交流，**请勿传播扩散**。
+- [anonymous5l/ncmdump](https://github.com/anonymous5l/ncmdump): Original repository
 
 ## Fork
 
-- [JamieDummy/NCM_dump](https://github.com/JamieDummy/NCM_dump): 增加 GUI
-- [mnilzg/ncmdump](https://github.com/mnilzg/ncmdump): 使用 numpy 大幅提高性能 
+- [JamieDummy/NCM_dump](https://github.com/JamieDummy/NCM_dump): Add GUI
+- [mnilzg/ncmdump](https://github.com/mnilzg/ncmdump): Speed up with NumPy
 
 
 ## Dependency
@@ -47,5 +47,5 @@ optional arguments:
   -s          skip conversion if file exist
 ```
 
-> supported name holder: %artist%, %title%, %album%
+> Supported name holder: %artist%, %title%, %album%
 
