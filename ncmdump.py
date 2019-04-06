@@ -74,10 +74,11 @@ def dump(input_path, output_path = None, skip = True):
     output_path = output_path(input_path, meta_data)
     if skip and os.path.exists(output_path): return
 
-    data = bytearray(f.read())
+    data = f.read()
     f.close()
 
     # stream cipher (modified RC4 Pseudo-random generation algorithm)
+    # data = bytearray(data)
     # i = 0
     # j = 0
     # for k, _ in enumerate(data):
@@ -87,7 +88,7 @@ def dump(input_path, output_path = None, skip = True):
     #     data[k] ^= S[(S[i] + S[j]) % 256]
 
     stream = [S[(S[i] + S[(i + S[i]) & 0xFF]) & 0xFF] for i in range(256)]
-    stream = bytearray(stream * (len(data) // 256 + 1))[1:1 + len(data)]
+    stream = bytes(bytearray(stream * (len(data) // 256 + 1))[1:1 + len(data)])
     data = XOR(data, stream)
 
     m = open(output_path, 'wb')
