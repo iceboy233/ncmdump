@@ -56,6 +56,7 @@ def dump(input_path, output_path = None, skip = True):
     if meta_length:
         meta_data = bytearray(f.read(meta_length))
         meta_data = bytes(bytearray([byte ^ 0x63 for byte in meta_data]))
+        comment_data = meta_data.decode('utf-8')
         meta_data = base64.b64decode(meta_data[22:])
 
         cryptor = AES.new(meta_key, AES.MODE_ECB)
@@ -109,6 +110,7 @@ def dump(input_path, output_path = None, skip = True):
             image = id3.APIC()
             embed(image, image_data)
             audio.tags.add(image)
+            audio.tags.add(id3.COMM(text = comment_data))
         audio.save()
 
     if meta_length:
