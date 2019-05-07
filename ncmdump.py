@@ -56,7 +56,7 @@ def dump(input_path, output_path = None, skip = True):
     if meta_length:
         meta_data = bytearray(f.read(meta_length))
         meta_data = bytes(bytearray([byte ^ 0x63 for byte in meta_data]))
-        comment_data = meta_data.decode('utf-8')
+        identification = meta_data.decode('utf-8')
         meta_data = base64.b64decode(meta_data[22:])
 
         cryptor = AES.new(meta_key, AES.MODE_ECB)
@@ -92,34 +92,39 @@ def dump(input_path, output_path = None, skip = True):
     m.close()
 
     # media tag
-    def embed(item, content):
+    def embed(item, content, type):
         item.encoding = 0
-        item.type = 3
+        item.type = type
         item.mime = 'image/png' if content[0:4] == binascii.a2b_hex('89504E47') else 'image/jpeg'
         item.data = content
-    
+
     if image_data:
         if meta_data['format'] == 'flac':
             audio = flac.FLAC(output_path)
             image = flac.Picture()
-            embed(image, image_data)
+            embed(image, image_data, 3)
             audio.clear_pictures()
             audio.add_picture(image)
         elif meta_data['format'] == 'mp3':
             audio = mp3.MP3(output_path)
             image = id3.APIC()
-            embed(image, image_data)
+            embed(image, image_data, 6)
             audio.tags.add(image)
-            audio.tags.add(id3.COMM(text = comment_data))
         audio.save()
 
     if meta_length:
-        audio = flac.FLAC(output_path) if meta_data['format'] == 'flac' else mp3.EasyMP3(output_path)
+        if meta_data['format'] == 'flac':
+            audio = flac.FLAC(output_path)
+            audio['description'] = identification
+        else:
+            audio = mp3.EasyMP3(output_path)
+            audio.tags.RegisterTextKey('comment', 'COMM')
+            audio['comment'] = identification
         audio['title'] = meta_data['musicName']
         audio['album'] = meta_data['album']
         audio['artist'] = '/'.join([artist[0] for artist in meta_data['artist']])
         audio.save()
-    
+
     return output_path
 
 if __name__ == '__main__':
