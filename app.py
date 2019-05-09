@@ -54,9 +54,9 @@ def validate_collision(path):
 
 def name_format(path, meta):
     information = {
-        'artist': ','.join([artist[0] for artist in meta['artist']]),
-        'title': meta['musicName'],
-        'album': meta['album']
+        'artist': ','.join([artist[0] for artist in (meta.get('artist') if meta.get('artist') is not None else [])]),
+        'title': meta.get('musicName'),
+        'album': meta.get('album')
     }
 
     def substitute(matched):
@@ -91,6 +91,7 @@ for path in args.input:
         continue
     if os.path.isdir(path):
         files += [os.path.join(path, name) for name in os.listdir(path) if os.path.splitext(name)[-1] == '.ncm']
+        print(files)
     else:
         files += [path]
 
