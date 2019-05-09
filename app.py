@@ -91,6 +91,7 @@ for path in args.input:
         continue
     if os.path.isdir(path):
         files += [os.path.join(path, name) for name in os.listdir(path) if os.path.splitext(name)[-1] == '.ncm']
+        print(files)
     else:
         files += [path]
 
