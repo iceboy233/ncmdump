@@ -54,7 +54,7 @@ def validate_collision(path):
 
 def name_format(path, meta):
     information = {
-        'artist': ','.join([artist[0] for artist in (meta.get('artist') if meta.get('artist') is not None else [])]),
+        'artist': ','.join([artist[0] for artist in meta.get('artist')]) if 'artist' in meta else None,
         'title': meta.get('musicName'),
         'album': meta.get('album')
     }

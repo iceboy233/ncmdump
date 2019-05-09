@@ -1,3 +1,2 @@
-Crypto
 mutagen
 pycryptodome
