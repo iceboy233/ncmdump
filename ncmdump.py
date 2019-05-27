@@ -28,8 +28,9 @@ def dump(input_path, output_path = None, skip = True):
     header = f.read(8)
     assert binascii.b2a_hex(header) == b'4354454e4644414d'
 
-    # key data
     f.seek(2, 1)
+
+    # key data
     key_length = f.read(4)
     key_length = struct.unpack('<I', bytes(key_length))[0]
 
@@ -65,15 +66,16 @@ def dump(input_path, output_path = None, skip = True):
     else:
         meta_data = {'format': 'flac' if os.fstat(f.fileno()).st_size > 1024 ** 2 * 16 else 'mp3'}
 
-    # crc32
-    crc32 = f.read(4)
-    crc32 = struct.unpack('<I', bytes(crc32))[0]
+    f.seek(5, 1)
 
     # album cover
-    f.seek(5, 1)
+    image_space = f.read(4)
+    image_space = struct.unpack('<I', bytes(image_space))[0]
     image_size = f.read(4)
     image_size = struct.unpack('<I', bytes(image_size))[0]
     image_data = f.read(image_size) if image_size else None
+
+    f.seek(image_space - image_size, 1)
 
     # media data
     output_path = output_path(input_path, meta_data)
