@@ -11,9 +11,7 @@
 ### Fork
 
 - [JamieDummy/NCM_dump](https://github.com/JamieDummy/NCM_dump): Add GUI
-
 - [mnilzg/ncmdump](https://github.com/mnilzg/ncmdump): Speed up with NumPy
-
 
 ## Dependency
 
