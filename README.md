@@ -2,13 +2,16 @@
 
 ![shield](https://img.shields.io/badge/python-2.7%7C3.4+-blue.svg)
 
-## Thank
+## Credit
+
+### Origin
 
 - [anonymous5l/ncmdump](https://github.com/anonymous5l/ncmdump): Original repository
 
-## Fork
+### Fork
 
 - [JamieDummy/NCM_dump](https://github.com/JamieDummy/NCM_dump): Add GUI
+
 - [mnilzg/ncmdump](https://github.com/mnilzg/ncmdump): Speed up with NumPy
 
 
