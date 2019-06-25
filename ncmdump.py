@@ -61,8 +61,8 @@ def dump(input_path, output_path = None, skip = True):
         meta_data = base64.b64decode(meta_data[22:])
 
         cryptor = AES.new(meta_key, AES.MODE_ECB)
-        meta_data = unpad(cryptor.decrypt(meta_data)).decode('utf-8')[6:]
-        meta_data = json.loads(meta_data)
+        meta_data = unpad(cryptor.decrypt(meta_data)).decode('utf-8')
+        meta_data = json.loads(meta_data[6:])
     else:
         meta_data = {'format': 'flac' if os.fstat(f.fileno()).st_size > 1024 ** 2 * 16 else 'mp3'}
 
@@ -120,6 +120,7 @@ def dump(input_path, output_path = None, skip = True):
             audio['description'] = identification
         else:
             audio = mp3.EasyMP3(output_path)
+            audio['title'] = 'placeholder'
             audio.tags.RegisterTextKey('comment', 'COMM')
             audio['comment'] = identification
         audio['title'] = meta_data['musicName']
