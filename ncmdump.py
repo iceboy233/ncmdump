@@ -10,6 +10,7 @@ import base64, json
 import os, traceback
 
 from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
 from Crypto.Util.strxor import strxor as XOR
 from mutagen import mp3, flac, id3
 
@@ -20,7 +21,6 @@ def dump(input_path, output_path = None, skip = True):
 
     core_key = binascii.a2b_hex('687A4852416D736F356B496E62617857')
     meta_key = binascii.a2b_hex('2331346C6A6B5F215C5D2630553C2728')
-    unpad = lambda s : s[0:-(s[-1] if type(s[-1]) == int else ord(s[-1]))]
 
     f = open(input_path, 'rb')
 
@@ -38,7 +38,7 @@ def dump(input_path, output_path = None, skip = True):
     key_data = bytes(bytearray([byte ^ 0x64 for byte in key_data]))
 
     cryptor = AES.new(core_key, AES.MODE_ECB)
-    key_data = unpad(cryptor.decrypt(key_data))[17:]
+    key_data = unpad(cryptor.decrypt(key_data), 16)[17:]
     key_length = len(key_data)
 
     # S-box (standard RC4 Key-scheduling algorithm)
@@ -61,7 +61,7 @@ def dump(input_path, output_path = None, skip = True):
         meta_data = base64.b64decode(meta_data[22:])
 
         cryptor = AES.new(meta_key, AES.MODE_ECB)
-        meta_data = unpad(cryptor.decrypt(meta_data)).decode('utf-8')
+        meta_data = unpad(cryptor.decrypt(meta_data), 16).decode('utf-8')
         meta_data = json.loads(meta_data[6:])
     else:
         meta_data = {'format': 'flac' if os.fstat(f.fileno()).st_size > 1024 ** 2 * 16 else 'mp3'}
