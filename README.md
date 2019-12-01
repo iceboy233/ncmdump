@@ -18,7 +18,7 @@
 
 - [@kalteblau](https://github.com/kalteblau): Validate path & collision
 - [@HarrisonXi](https://github.com/HarrisonXi): Add missing identifier
-- [@leconio](https://github.com/leconio): handle dict key missing exception
+- [@leconio](https://github.com/leconio): Handle dict key missing exception
 - [@lonelyhentai](https://github.com/lonelyhentai): Add pip support
 
 ## Dependency
