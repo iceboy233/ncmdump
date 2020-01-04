@@ -1,6 +1,18 @@
 # -*- coding: utf-8 -*-
-
+import os
 from setuptools import setup, find_packages
+
+try:
+    from pip._internal.req import parse_requirements
+    from pip._internal.download import PipSession
+except ImportError:
+    from pip.req import parse_requirements
+    from pip.download import PipSession
+
+requirements = parse_requirements(
+    os.path.join(os.path.dirname(__file__), 'requirements.txt'),
+    session = PipSession()
+)
 
 setup(
     name = 'ncmdump',
@@ -15,7 +27,7 @@ setup(
     platforms = 'any',
     zip_safe = False,
     python_requires = '>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
-    install_requires = ['pycryptodome', 'mutagen'],
+    install_requires = [str(requirement.req) for requirement in requirements],
     entry_points = {
         'console_scripts': [
             'ncmdump=ncmdump.app:main'
