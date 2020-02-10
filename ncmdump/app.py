@@ -6,7 +6,12 @@ Created on Fri Sep 28 13:32:51 2018
 """
 
 import argparse, os, sys, traceback, re
-from .core import dump
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+if __package__ is None:
+    from core import dump
+else:
+    from .core import dump
 
 parser = argparse.ArgumentParser(
     prog = 'ncmdump', add_help = False
