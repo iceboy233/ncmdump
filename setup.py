@@ -4,14 +4,12 @@ from setuptools import setup, find_packages
 
 try:
     from pip._internal.req import parse_requirements
-    from pip._internal.download import PipSession
 except ImportError:
     from pip.req import parse_requirements
-    from pip.download import PipSession
 
 requirements = parse_requirements(
     os.path.join(os.path.dirname(__file__), 'requirements.txt'),
-    session = PipSession()
+    session = False
 )
 
 setup(
