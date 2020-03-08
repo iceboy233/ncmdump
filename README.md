@@ -1,6 +1,6 @@
 # Netease Cloud Music Copyright Protection File Dump
 
-![shield](https://img.shields.io/badge/python-2.7%7C3.4+-blue.svg)
+![shield](https://img.shields.io/badge/python-2.7%20%7C%203.4%2B-blue)
 
 ## Credit
 
