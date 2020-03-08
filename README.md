@@ -38,7 +38,7 @@ $ pip install git+https://github.com/nondanee/ncmdump.git
 ### Execute
 
 ```sh
-$ ncmdump -h # equivalent to "python ncmdump/app.py -h" and "python -m ncmdump.app"
+$ ncmdump -h # equivalent to "python ncmdump/app.py -h" and "python -m ncmdump.app -h"
 usage: ncmdump [-h] [-f format] [-o output] [-d] [-c | -r] [input [input ...]]
 
 positional arguments:
