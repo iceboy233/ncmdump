@@ -57,7 +57,7 @@ def dump(input_path, output_path = None, skip = True):
     if meta_length:
         meta_data = bytearray(f.read(meta_length))
         meta_data = bytes(bytearray([byte ^ 0x63 for byte in meta_data]))
-        identification = meta_data.decode('utf-8')
+        identifier = meta_data.decode('utf-8')
         meta_data = base64.b64decode(meta_data[22:])
 
         cryptor = AES.new(meta_key, AES.MODE_ECB)
@@ -117,12 +117,12 @@ def dump(input_path, output_path = None, skip = True):
     if meta_length:
         if meta_data['format'] == 'flac':
             audio = flac.FLAC(output_path)
-            audio['description'] = identification
+            audio['description'] = identifier
         else:
             audio = mp3.EasyMP3(output_path)
             audio['title'] = 'placeholder'
             audio.tags.RegisterTextKey('comment', 'COMM')
-            audio['comment'] = identification
+            audio['comment'] = identifier
         audio['title'] = meta_data['musicName']
         audio['album'] = meta_data['album']
         audio['artist'] = '/'.join([artist[0] for artist in meta_data['artist']])
