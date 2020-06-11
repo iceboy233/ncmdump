@@ -1,6 +1,6 @@
 # Netease Cloud Music Copyright Protection File Dump
 
-![shield](https://img.shields.io/badge/python-2.7%7C3.4+-blue.svg)
+![shield](https://img.shields.io/badge/python-2.7%20%7C%203.4%2B-blue)
 
 ## Credit
 
@@ -38,7 +38,7 @@ $ pip install git+https://github.com/nondanee/ncmdump.git
 ### Execute
 
 ```sh
-$ ncmdump -h # equivalent to "python ncmdump/app.py -h" and "python -m ncmdump.app"
+$ ncmdump -h # equivalent to "python ncmdump/app.py -h" and "python -m ncmdump.app -h"
 usage: ncmdump [-h] [-f format] [-o output] [-d] [-c | -r] [input [input ...]]
 
 positional arguments:
