@@ -20,6 +20,8 @@
 - [@HarrisonXi](https://github.com/HarrisonXi): Add missing identifier
 - [@leconio](https://github.com/leconio): Handle dict key missing exception
 - [@lonelyhentai](https://github.com/lonelyhentai): Add pip support
+- [@YujiaCheng1996](https://github.com/YujiaCheng1996): Fix pip error
+- [@zxsean](https://github.com/zxsean): Add recursive traversal for directory
 
 ## Dependency
 
