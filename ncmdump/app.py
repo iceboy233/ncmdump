@@ -84,6 +84,19 @@ def name_format(path, meta):
     if args.rename: save = validate_collision(save)
     return save
 
+def search_ncms(path, list):
+    fileNames = os.listdir(path)
+    for filePath in fileNames:
+        tempPath = path + '/' + filePath
+
+        if os.path.isfile(tempPath):
+            if os.path.splitext(tempPath)[1] == ".ncm":
+                tempPath = tempPath.replace("\\", "/")
+                if not tempPath in list:
+                    list.append(tempPath)
+        else:
+            search_ncms(tempPath, list)
+
 def main():
     if args.output:
         args.output = os.path.abspath(args.output)
@@ -100,9 +113,11 @@ def main():
         if not os.path.exists(path):
             continue
         if os.path.isdir(path):
-            files += [os.path.join(path, name) for name in os.listdir(path) if os.path.splitext(name)[-1] == '.ncm']
+            search_ncms(path, files)
         else:
-            files += [path]
+            path = path.replace("\\", "/")
+            if not path in files:
+                files += [path]
 
     if sys.version[0] == '2':
         files = [path.decode(sys.stdin.encoding) for path in files]
