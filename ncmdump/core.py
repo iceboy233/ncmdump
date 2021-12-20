@@ -11,7 +11,7 @@ import os
 
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
-from Crypto.Util.strxor import strxor as XOR
+from Crypto.Util.strxor import strxor
 from mutagen import mp3, flac, id3
 
 def dump(input_path, output_path = None, skip = True):
@@ -26,7 +26,7 @@ def dump(input_path, output_path = None, skip = True):
 
     # magic header
     header = f.read(8)
-    assert binascii.b2a_hex(header) == b'4354454e4644414d'
+    assert header == binascii.a2b_hex('4354454e4644414d')
 
     f.seek(2, 1)
 
@@ -81,17 +81,19 @@ def dump(input_path, output_path = None, skip = True):
     output_path = output_path_generator(input_path, meta_data)
     if skip and os.path.exists(output_path): return
 
-    data = f.read()
-    f.close()
-
     # stream cipher (modified RC4 Pseudo-random generation algorithm)
     stream = [S[(S[i] + S[(i + S[i]) & 0xFF]) & 0xFF] for i in range(256)]
-    stream = bytes(bytearray(stream * (len(data) // 256 + 1))[1:1 + len(data)])
-    data = XOR(data, stream)
+    stream = bytes(stream[1:] + stream[:1]) * 64
 
     m = open(output_path, 'wb')
-    m.write(data)
+    while True:
+        data = f.read(16384)
+        if not data:
+            break
+        data = strxor(data, stream[:len(data)])
+        m.write(data)
     m.close()
+    f.close()
 
     # media tag
     def embed(item, content, type):
